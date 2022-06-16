@@ -1,0 +1,34 @@
+version: '3'
+services:
+  api:
+    image: 'node:12.18.4'
+    working_dir: /server
+    ports:
+      - 3000:3000
+    enviroment:
+      - port=3000
+      - PGUSER=tommy
+      - PGHOST=db
+      - PGPASSWORD=tommypassword
+      - PGDATABASE=users
+      - PGPORT=5432
+    depends_on:
+      - db
+    volumes:
+      - type: bind
+        source: ./api
+        target: /server
+    command: bash -c "npm install -g nodemon && npm install && npm start"
+  db:
+    image: 'postgres:11.1'
+    expose:
+      - '5432'
+    volumes:
+      - 'dbdata:/var/lib/postgresql/data'
+      - './db/setup/:/docker-entrypoint-initdb.d/:ro'
+    environment:
+      - POSTGRES_DB=users
+      - POSTGRES_USER=tommy
+      - POSTGRES_PASSWORD=tommypassword
+volumes:
+  dbdata:
